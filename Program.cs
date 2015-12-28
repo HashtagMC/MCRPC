@@ -1,6 +1,7 @@
 using System;
 using System.Windows.Forms;
 using System.IO;
+using System.IO.Compression;
 
 namespace MCRPC
 {
@@ -78,6 +79,26 @@ namespace MCRPC
 			} catch(Exception e) {
 				Console.WriteLine ("Execution failed: {0}", e.ToString ());
 			}
+
+			// ---- Extract minecraft jar ---- //
+			var mcjar = appdata + @"\.minecraft\versions\1.8\1.8.jar";
+
+			ZipFile.ExtractToDirectory (mcjar, packpath);
+
+			// ---- Delete unnessecary files, such as .class or META-INF ---- //
+			var directoryPath = new DirectoryInfo (packpath);
+
+			foreach (var file in directoryPath.EnumerateFiles("*.class")) {
+				file.Delete();
+			}
+
+			foreach (var file in directoryPath.EnumerateFiles("log*.xml")) {
+				file.Delete();
+			}
+
+			Directory.Delete (packpath + @"\META-INF", true);
+
+			Directory.Delete (packpath + @"\net", true);
 
 			// ---- Done! ---- //
 		}
