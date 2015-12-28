@@ -39,8 +39,20 @@ namespace MCRPC
 			String packformat = Console.ReadLine ();
 			Console.WriteLine ("");
 
+			// ---- Version ---- //
+			var version = "";
+
+			switch (packformat) {
+				case "1":
+					version = "1.8.x or earlier";
+					break;
+			case "2":
+				version = "1.9.x or later";
+				break;
+			}
+
 			// ---- Summary ---- //
-			Console.WriteLine ("Summary: \n{0}\n{1}\n{2}", name, desc, packformat);
+			Console.WriteLine ("-- Summary --\nName: {0}\nDescription: {1}\nVersion: {2}", name, desc, version);
 			Console.WriteLine ("");
 
 			// ---- Verify / sanitize pack format ---- //
@@ -83,9 +95,11 @@ namespace MCRPC
 			// ---- Extract minecraft jar ---- //
 			var mcjar = appdata + @"\.minecraft\versions\1.8\1.8.jar";
 
+			Console.WriteLine ("Extracting 1.8.jar");
 			ZipFile.ExtractToDirectory (mcjar, packpath);
 
 			// ---- Delete unnessecary files, such as .class or META-INF ---- //
+			Console.WriteLine("Deleting unnessecary files");
 			var directoryPath = new DirectoryInfo (packpath);
 
 			foreach (var file in directoryPath.EnumerateFiles("*.class")) {
@@ -101,6 +115,7 @@ namespace MCRPC
 			Directory.Delete (packpath + @"\net", true);
 
 			// ---- Done! ---- //
+			Console.WriteLine("Done!");
 		}
 	}
 }
