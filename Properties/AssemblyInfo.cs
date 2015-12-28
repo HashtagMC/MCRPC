@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 // Change them to the values specific to your project.
 
 [assembly: AssemblyTitle ("MCRPC")]
-[assembly: AssemblyDescription ("The Minecraft Resource Pack Creator is a simple console application, creating a pack.mcmeta and folder for you.")]
+[assembly: AssemblyDescription ("The Minecraft Resource Pack Creator is a simple console application, creating a pack.mcmeta and folder as well as extracting the vanilla assets for you.")]
 [assembly: AssemblyConfiguration ("")]
 [assembly: AssemblyCompany ("")]
 [assembly: AssemblyProduct ("Minecraft Resource Pack Creator")]
