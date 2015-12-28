@@ -63,8 +63,9 @@ namespace MCRPC
 					return;
 				}
 
-				//Everything's ok? Create folder
+				//Everything's ok? Create folder + assets folder
 				DirectoryInfo packdir = Directory.CreateDirectory(packpath);
+				DirectoryInfo assetsdir = Directory.CreateDirectory(packpath + @"\assets");
 
 				//Write pack.mcmeta
 				try {
