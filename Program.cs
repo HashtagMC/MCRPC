@@ -1,27 +1,130 @@
-using System;
-using System.Windows.Forms;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
-using System.IO.Compression;
+using System.Runtime.InteropServices;
+using System.Windows.Forms;
 
-namespace MCRPC
+using MCRPCGUI;
+
+namespace MCRPCGUI
 {
-	class MainClass
+	class Window
 	{
-		public static void Main (string[] args)
+		//Close console window
+		[DllImport("kernel32.dll", SetLastError = true)]
+		private static extern bool FreeConsole();
+
+		[STAThread]
+		public static void Main ()
 		{
-			// ---- Init ---- //
-			Console.Title = "MCRPC";
-			Console.WriteLine ("Welcome to the Minecraft Resource Pack Creator 'MCRPC'");
-			Console.WriteLine ("");
+			FreeConsole ();
+			Application.EnableVisualStyles();
 
-			// ---- Get the necessary data ---- //
+			// ---- Icon ---- //
+			var iconpath = System.Reflection.Assembly.GetExecutingAssembly ().GetManifestResourceStream ("icon");
+			Icon icon = new Icon (iconpath);
 
-			// ---- Name ---- //
-			Console.Write ("Please enter the name of your resource pack: ");
-			var name = Console.ReadLine ();
-			Console.WriteLine (""); //Newline
+			// ---- GUI ---- //
+			Form form = new Form();
+			form.Text = "MCRPC";
+			form.Width = 256;
+			form.Height = 350;
+			form.MaximizeBox = false;
+			form.MinimizeBox = false;
+			form.FormBorderStyle = FormBorderStyle.FixedSingle;
+			form.Icon = icon;
 
-			// ---- Remove invalid chars from foldername ---- //
+			TextBox namefield = new TextBox ();
+			namefield.Text = "Name";
+			namefield.Width = 128;
+			namefield.Height = 20;
+			namefield.TabIndex = 1;
+			namefield.Name = "namefield";
+
+			Button startbutton = new Button ();
+			startbutton.Text = "Create Pack";
+			startbutton.Width = 112;
+			startbutton.Height = 20;
+			startbutton.Location = new Point (128, 0);
+			startbutton.TabIndex = 5;
+			startbutton.Click += new EventHandler (startbutton_Click);
+
+			GroupBox packformatgroup = new GroupBox ();
+
+			RadioButton packformat1 = new RadioButton ();
+			packformat1.Text = "pre 1.9";
+			packformat1.Height = 20;
+			packformat1.Width = 64;
+			packformat1.Location = new Point (8, 100);
+			packformat1.TabIndex = 3;
+			packformat1.Name = "packformat1";
+			packformat1.Checked = true;
+
+			RadioButton packformat2 = new RadioButton ();
+			packformat2.Text = "post 1.9";
+			packformat2.Height = 20;
+			packformat2.Width = 80;
+			packformat2.Location = new Point (72, 100);
+			packformat2.TabIndex = 4;
+			packformat2.Name = "packformat2";
+
+			packformatgroup.Controls.Add (packformat1);
+			packformatgroup.Controls.Add (packformat2);
+
+			TextBox descriptionfield = new TextBox ();
+			descriptionfield.Text = "Description";
+			descriptionfield.Multiline = true;
+			descriptionfield.Height = 80;
+			descriptionfield.Width = 256;
+			descriptionfield.Location = new Point (0, 20);
+			descriptionfield.TabIndex = 2;
+			descriptionfield.Name = "descriptionfield";
+
+			TextBox outputfield = new TextBox ();
+			outputfield.Multiline = true;
+			outputfield.Width = 256;
+			outputfield.Height = 192;
+			outputfield.Location = new Point (0, 120);
+			outputfield.ReadOnly = true;
+			outputfield.Name = "outputfield";
+
+			form.Controls.Add (namefield);
+			form.Controls.Add (startbutton);
+			form.Controls.Add (packformat1);
+			form.Controls.Add (packformat2);
+			form.Controls.Add (descriptionfield);
+			form.Controls.Add (outputfield);
+			form.Show();
+
+			// ---- Run ---- //
+			Application.Run(form);
+		}
+
+		public static void startbutton_Click(object sender, EventArgs eventArgs)
+		{
+			// ---- Get all necessary GUI items ---- //
+			Button button = sender as Button;
+			Form form = button.FindForm () as Form;
+			TextBox outputfield = form.Controls ["outputfield"] as TextBox;
+			TextBox namefield = form.Controls ["namefield"] as TextBox;
+			TextBox descriptionfield = form.Controls ["descriptionfield"] as TextBox;
+			RadioButton packformat1 = form.Controls ["packformat1"] as RadioButton;
+			RadioButton packformat2 = form.Controls ["packformat2"] as RadioButton;
+
+			// ---- pack_format, name, description, version ---- //
+			var pack_format = "1";
+			var name = namefield.Text;
+			var description = descriptionfield.Text;
+			var version = "1.8.x or earlier";
+			if (packformat2.Checked)
+			{
+				pack_format = "2";
+				version = "1.9.x or later";
+			}
+
+			// ---- Remove invalid chars from name ---- //
 			string invalid = new string(Path.GetInvalidFileNameChars()) + new string(Path.GetInvalidPathChars());
 
 			foreach (char c in invalid)
@@ -29,93 +132,17 @@ namespace MCRPC
 				name = name.Replace(c.ToString(), "");
 			}
 
-			// ---- Description ---- //
-			Console.Write (@"Please enter the description (use \n as newline) of your resource pack: ");
-			var desc = Console.ReadLine ();
-			Console.WriteLine ("");
+			// ---- summary ---- //
+			output ("-- Summary --" + Environment.NewLine + "Name: " + name + Environment.NewLine + "Description: " + Environment.NewLine + description + Environment.NewLine + "Version: " + version, outputfield);
 
-			// ---- Pack format ---- //
-			Console.Write("Please enter the pack format (1 for 1.8 or earlier, 2 for 1.9 or later). Leave blank to use the default value: ");
-			String packformat = Console.ReadLine ();
-			Console.WriteLine ("");
+			// ---- Create pack ---- //
+			new MCRPC (name, description, pack_format, outputfield);
+		}
 
-			// ---- Version ---- //
-			var version = "";
-
-			switch (packformat) {
-				case "1":
-					version = "1.8.x or earlier";
-					break;
-			case "2":
-				version = "1.9.x or later";
-				break;
-			}
-
-			// ---- Summary ---- //
-			Console.WriteLine ("-- Summary --\nName: {0}\nDescription: {1}\nVersion: {2}", name, desc, version);
-			Console.WriteLine ("");
-
-			// ---- Verify / sanitize pack format ---- //
-			if (packformat.Equals ("1") || packformat.Equals ("2")) {
-
-			} else {
-				packformat = "1";
-			}
-
-			// ---- Path & Files ---- //
-			var appdata = System.Environment.GetEnvironmentVariable ("AppData"); //get appdata path
-			var rppath = appdata + @"\.minecraft\resourcepacks\"; //path to resourcepack folder
-			var packpath = rppath + name + @"\"; //path to resource pack
-
-			// ---- Don't overwrite anything ---- //
-			try {
-				if (Directory.Exists(packpath)){
-					Console.WriteLine ("Directory {0} already exists!", packpath);
-					return;
-				}
-
-				//Everything's ok? Create folder + assets folder
-				DirectoryInfo packdir = Directory.CreateDirectory(packpath);
-				DirectoryInfo assetsdir = Directory.CreateDirectory(packpath + @"\assets");
-
-				//Write pack.mcmeta
-				try {
-					StreamWriter mcmeta = new StreamWriter (packpath + "pack.mcmeta", true);
-					mcmeta.Write ("{\n  \"pack\": {\n    \"pack_format\": " + packformat + ",\n    \"description\": \"" + desc + "\"\n  }\n}");
-					mcmeta.Close ();
-				} catch (Exception e) {
-					Console.WriteLine ("Execution failed: {0}", e.ToString());
-				}
-
-
-			} catch(Exception e) {
-				Console.WriteLine ("Execution failed: {0}", e.ToString ());
-			}
-
-			// ---- Extract minecraft jar ---- //
-			var mcjar = appdata + @"\.minecraft\versions\1.8\1.8.jar";
-
-			Console.WriteLine ("Extracting 1.8.jar");
-			ZipFile.ExtractToDirectory (mcjar, packpath);
-
-			// ---- Delete unnessecary files, such as .class or META-INF ---- //
-			Console.WriteLine("Deleting unnessecary files");
-			var directoryPath = new DirectoryInfo (packpath);
-
-			foreach (var file in directoryPath.EnumerateFiles("*.class")) {
-				file.Delete();
-			}
-
-			foreach (var file in directoryPath.EnumerateFiles("log*.xml")) {
-				file.Delete();
-			}
-
-			Directory.Delete (packpath + @"\META-INF", true);
-
-			Directory.Delete (packpath + @"\net", true);
-
-			// ---- Done! ---- //
-			Console.WriteLine("Done!");
+		// ---- Output function, nothing more than a substitute for Control.Text += text ---- //
+		public static void output(string text, TextBox output)
+		{
+			output.Text += text;
 		}
 	}
 }
