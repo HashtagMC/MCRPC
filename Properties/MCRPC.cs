@@ -19,7 +19,7 @@ namespace MCRPCGUI
 			// ---- Don't overwrite anything ---- //
 			try {
 				if (Directory.Exists(packpath)){
-					MessageBox.Show ("Directory {0} already exists!", packpath);
+					MessageBox.Show ("Directory \"" + packpath + "\" already exists!");
 					return;
 				}
 
@@ -36,7 +36,6 @@ namespace MCRPCGUI
 					MessageBox.Show ("Execution failed: {0}", e.ToString());
 				}
 
-
 			} catch(Exception e) {
 				MessageBox.Show ("Execution failed: {0}", e.ToString ());
 			}
@@ -45,26 +44,30 @@ namespace MCRPCGUI
 			var mcjar = appdata + @"\.minecraft\versions\1.8\1.8.jar";
 
 			output (Environment.NewLine + "Extracting 1.8.jar", outputfield);
-			ZipFile.ExtractToDirectory (mcjar, packpath);
+			try {
+				ZipFile.ExtractToDirectory (mcjar, packpath);
+				// ---- Delete unnessecary files, such as .class or META-INF ---- //
+				output(Environment.NewLine + "Deleting unnessecary files", outputfield);
+				var directoryPath = new DirectoryInfo (packpath);
 
-			// ---- Delete unnessecary files, such as .class or META-INF ---- //
-			output(Environment.NewLine + "Deleting unnessecary files", outputfield);
-			var directoryPath = new DirectoryInfo (packpath);
+				foreach (var file in directoryPath.EnumerateFiles("*.class")) {
+					file.Delete();
+				}
 
-			foreach (var file in directoryPath.EnumerateFiles("*.class")) {
-				file.Delete();
+				foreach (var file in directoryPath.EnumerateFiles("log*.xml")) {
+					file.Delete();
+				}
+				Directory.Delete (packpath + @"\META-INF", true);
+
+				Directory.Delete (packpath + @"\net", true);
+
+				// ---- Done! ---- //
+				output(Environment.NewLine + "Done!", outputfield);
+			} catch (Exception e) {
+				output(Environment.NewLine + "Execution failed: Make sure you have Minecraft 1.8 installed" + Environment.NewLine + Environment.NewLine + e.ToString(), outputfield);
+				MessageBox.Show ("Execution failed: Make sure you have Minecraft 1.8 installed!");
+				Directory.Delete (packpath, true);
 			}
-
-			foreach (var file in directoryPath.EnumerateFiles("log*.xml")) {
-				file.Delete();
-			}
-
-			Directory.Delete (packpath + @"\META-INF", true);
-
-			Directory.Delete (packpath + @"\net", true);
-
-			// ---- Done! ---- //
-			output(Environment.NewLine + "Done!", outputfield);
 
 		}
 
