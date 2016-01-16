@@ -9,7 +9,7 @@ namespace MCRPCGUI
 {
 	public class MCRPC
 	{
-		public MCRPC (String name, String desc, String pack_format, TextBox outputfield)
+		public MCRPC (String name, String desc, String pack_format, TextBox outputfield, String version)
 		{
 			// ---- Path & Files ---- //
 			var appdata = System.Environment.GetEnvironmentVariable ("AppData"); //get appdata path
@@ -41,9 +41,9 @@ namespace MCRPCGUI
 			}
 
 			// ---- Extract minecraft jar ---- //
-			var mcjar = appdata + @"\.minecraft\versions\1.8\1.8.jar";
+			var mcjar = appdata + @"\.minecraft\versions\" + version + ".jar";
 
-			output (Environment.NewLine + "Extracting 1.8.jar", outputfield);
+			output (Environment.NewLine + "Extracting " + version + ".jar", outputfield);
 			try {
 				ZipFile.ExtractToDirectory (mcjar, packpath);
 				// ---- Delete unnessecary files, such as .class or META-INF ---- //

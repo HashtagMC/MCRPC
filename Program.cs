@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Windows.Controls;
 using System.Windows.Forms;
 
 using MCRPCGUI;
@@ -65,7 +66,7 @@ namespace MCRPCGUI
 			RadioButton packformat2 = new RadioButton ();
 			packformat2.Text = "post 1.9";
 			packformat2.Height = 20;
-			packformat2.Width = 80;
+			packformat2.Width = 64;
 			packformat2.Location = new Point (72, 100);
 			packformat2.TabIndex = 4;
 			packformat2.Name = "packformat2";
@@ -86,9 +87,28 @@ namespace MCRPCGUI
 			outputfield.Multiline = true;
 			outputfield.Width = 256;
 			outputfield.Height = 192;
-			outputfield.Location = new Point (0, 120);
+			outputfield.Location = new Point (0, 152);
 			outputfield.ReadOnly = true;
 			outputfield.Name = "outputfield";
+
+			var versionlist = new VersionList ();
+
+			ComboBox versionbox = new ComboBox ();
+			versionbox.Width = 240;
+			versionbox.Height = 32;
+			versionbox.Location = new Point (0, 130);
+			versionbox.DropDownWidth = 256;
+			versionbox.DropDownStyle = ComboBoxStyle.DropDown;
+			versionbox.Name = "versionbox";
+			foreach (var v in versionlist.versions) {
+				versionbox.Items.Add (v);
+			}
+			versionbox.SelectedIndex = 0;
+
+			Label vlabel = new Label ();
+			vlabel.BorderStyle = BorderStyle.None;
+			vlabel.Text = "Minecraft Version";
+			vlabel.Location = new Point (148, 115);
 
 			form.Controls.Add (namefield);
 			form.Controls.Add (startbutton);
@@ -96,6 +116,8 @@ namespace MCRPCGUI
 			form.Controls.Add (packformat2);
 			form.Controls.Add (descriptionfield);
 			form.Controls.Add (outputfield);
+			form.Controls.Add (versionbox);
+			form.Controls.Add (vlabel);
 			form.Show();
 
 			// ---- Run ---- //
@@ -112,8 +134,17 @@ namespace MCRPCGUI
 			TextBox descriptionfield = form.Controls ["descriptionfield"] as TextBox;
 			RadioButton packformat1 = form.Controls ["packformat1"] as RadioButton;
 			RadioButton packformat2 = form.Controls ["packformat2"] as RadioButton;
+			ComboBox versionbox = form.Controls ["versionbox"] as ComboBox;
 
 			// ---- pack_format, name, description, version ---- //
+			var jarversion = "";
+			try {
+				jarversion = versionbox.SelectedItem.ToString();
+				jarversion = jarversion + @"\" + jarversion;
+			} catch (NullReferenceException) {
+				jarversion = @"1.8\1.8";
+			}
+
 			var pack_format = "1";
 			var name = namefield.Text;
 			var description = descriptionfield.Text;
@@ -136,7 +167,8 @@ namespace MCRPCGUI
 			output ("-- Summary --" + Environment.NewLine + "Name: " + name + Environment.NewLine + "Description: " + Environment.NewLine + description + Environment.NewLine + "Version: " + version, outputfield);
 
 			// ---- Create pack ---- //
-			new MCRPC (name, description, pack_format, outputfield);
+			new MCRPC (name, description, pack_format, outputfield, jarversion);
+
 		}
 
 		// ---- Output function, nothing more than a substitute for Control.Text += text ---- //
