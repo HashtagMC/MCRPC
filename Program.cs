@@ -29,7 +29,7 @@ namespace MCRPCGUI
 
 			// ---- GUI ---- //
 			Form form = new Form();
-			form.Text = "MCRPC";
+			form.Text = "RPCMC";
 			form.Width = 256;
 			form.Height = 350;
 			form.MaximizeBox = false;
