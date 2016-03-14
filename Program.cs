@@ -94,7 +94,7 @@ namespace MCRPCGUI
 			var versionlist = new VersionList ();
 
 			ComboBox versionbox = new ComboBox ();
-			versionbox.Width = 240;
+			versionbox.Width = 120;
 			versionbox.Height = 32;
 			versionbox.Location = new Point (0, 130);
 			versionbox.DropDownWidth = 256;
@@ -105,19 +105,29 @@ namespace MCRPCGUI
 			}
 			versionbox.SelectedIndex = 0;
 
+			TextBox subfolder = new TextBox ();
+			subfolder.Height = 20;
+			subfolder.Width = 120;
+			subfolder.Location = new Point (120, 130);
+			subfolder.Name = "subfolder";
+
 			Label vlabel = new Label ();
 			vlabel.BorderStyle = BorderStyle.None;
 			vlabel.Text = "Minecraft Version";
 			vlabel.Location = new Point (148, 115);
 
-			form.Controls.Add (namefield);
-			form.Controls.Add (startbutton);
-			form.Controls.Add (packformat1);
-			form.Controls.Add (packformat2);
-			form.Controls.Add (descriptionfield);
-			form.Controls.Add (outputfield);
-			form.Controls.Add (versionbox);
-			form.Controls.Add (vlabel);
+			form.Controls.AddRange (new Control[] {
+				namefield,
+				startbutton,
+				packformat1,
+				packformat2,
+				descriptionfield,
+				outputfield,
+				versionbox,
+				subfolder,
+				vlabel
+			});
+
 			form.Show();
 
 			// ---- Run ---- //
@@ -135,6 +145,7 @@ namespace MCRPCGUI
 			RadioButton packformat1 = form.Controls ["packformat1"] as RadioButton;
 			RadioButton packformat2 = form.Controls ["packformat2"] as RadioButton;
 			ComboBox versionbox = form.Controls ["versionbox"] as ComboBox;
+			TextBox subfolder = form.Controls ["subfolder"] as TextBox;
 
 			// ---- pack_format, name, description, version ---- //
 			var jarversion = "";
@@ -167,7 +178,7 @@ namespace MCRPCGUI
 			output ("-- Summary --" + Environment.NewLine + "Name: " + name + Environment.NewLine + "Description: " + Environment.NewLine + description + Environment.NewLine + "Version: " + version, outputfield);
 
 			// ---- Create pack ---- //
-			new MCRPC (name, description, pack_format, outputfield, jarversion);
+			new MCRPC (name, description, pack_format, outputfield, jarversion, subfolder.Text);
 
 		}
 

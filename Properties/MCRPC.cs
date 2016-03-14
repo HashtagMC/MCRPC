@@ -9,11 +9,11 @@ namespace MCRPCGUI
 {
 	public class MCRPC
 	{
-		public MCRPC (String name, String desc, String pack_format, TextBox outputfield, String version)
+		public MCRPC (String name, String desc, String pack_format, TextBox outputfield, String version, String subfolder = "")
 		{
 			// ---- Path & Files ---- //
 			var appdata = System.Environment.GetEnvironmentVariable ("AppData"); //get appdata path
-			var rppath = appdata + @"\.minecraft\resourcepacks\"; //path to resourcepack folder
+			var rppath = appdata + @"\.minecraft\" + subfolder +  @"\resourcepacks\"; //path to resourcepack folder
 			var packpath = rppath + name + @"\"; //path to resource pack
 
 			// ---- Don't overwrite anything ---- //
