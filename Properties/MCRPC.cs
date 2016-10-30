@@ -9,7 +9,7 @@ namespace MCRPCGUI
 {
 	public class MCRPC
 	{
-		public MCRPC (String name, String desc, String pack_format, TextBox outputfield, String version, String subfolder = "")
+		public MCRPC (String name, String desc, String pack_format, TextBox outputfield, String version, String subfolder = "", String preview_image = "")
 		{
 			// ---- Path & Files ---- //
 			var appdata = System.Environment.GetEnvironmentVariable ("AppData"); //get appdata path
@@ -64,9 +64,17 @@ namespace MCRPCGUI
 				// ---- Done! ---- //
 				output(Environment.NewLine + "Done!", outputfield);
 			} catch (Exception e) {
-				output(Environment.NewLine + "Execution failed: Make sure you have Minecraft 1.8 installed" + Environment.NewLine + Environment.NewLine + e.ToString(), outputfield);
-				MessageBox.Show ("Execution failed: Make sure you have Minecraft 1.8 installed!");
+				output(Environment.NewLine + "Execution failed: Make sure you have Minecraft installed" + Environment.NewLine + Environment.NewLine + e.ToString(), outputfield);
+				MessageBox.Show ("Execution failed: Make sure you have Minecraft installed!");
 				Directory.Delete (packpath, true);
+			}
+
+			if(File.Exists(packpath + @"\pack.png")) {
+				File.Delete (packpath + @"\pack.png");
+			}
+
+			if (preview_image.Length > 1) {
+				File.Copy (preview_image, packpath + @"\pack.png");
 			}
 
 		}
