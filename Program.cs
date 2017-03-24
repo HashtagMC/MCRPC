@@ -160,8 +160,6 @@ namespace MCRPCGUI
 			tooltip1.SetToolTip (preview_source, "Type to select image\nDouble-click to open file window");
 
 
-
-
 			form.Controls.AddRange (new Control[] {
 				namefield,
 				startbutton,
@@ -273,12 +271,15 @@ namespace MCRPCGUI
 			var version_format = version_match.Groups [1].Value;
 			var version_format_number = Int32.Parse (version_format);
 
-			var pack_format = "2";
-			var version = "1.9.x +";
+			var pack_format = "3";
+			var version = "1.11.x +";
 
 			if (version_format_number < 9) {
 				pack_format = "1";
 				version = "1.6.x - 1.8.x";
+			} else if (version_format_number >= 9 && version_format_number <= 10 ) {
+				pack_format = "2";
+				version = "1.9.x - 1.10.x";
 			}
 
 
